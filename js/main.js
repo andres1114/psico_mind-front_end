@@ -67,7 +67,7 @@ function showMatchingUsers(args) {
                 userId: $(this).attr("data-user-id"),
                 userName: $(this).find("td").html(),
                 rrss: 'twitter',
-                postLimitNumber: 10
+                postLimitNumber: $("#tweet-limit").val()
             });
         });
 
@@ -113,6 +113,9 @@ function performSentimentAnalisys(args) {
             requestSentimentAnalysisResult();
         }
     });
+
+    $("#processed-items").html("(0/"+$("#tweet-limit").val()+")");
+    showProcessedItemsLoader();
 }
 
 function requestSentimentAnalysisResult() {

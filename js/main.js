@@ -201,10 +201,10 @@ function showSentimentAnalysisResult(args) {
     let overallSentimentText;
     switch (responseObject.sentimentData.evaluation) {
         case 'positive':
-            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-success" style="color: white;">POSITIVOS</b>, por lo cual se es indiferente si se lee o no a la persona.</p>`
+            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-success" style="color: white;">POSITIVOS</b>, por lo cual se recomienda leer a la persona.</p>`
             break;
         case 'neutral':
-            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-primary" style="color: white;">NEUTRALES</b>, por lo cual se recomienda leer a la persona.</p>`
+            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-primary" style="color: white;">NEUTRALES</b>, por lo cual se es indiferente si se lee o no a la persona.</p>`
             break;
         case 'negative':
             overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-danger" style="color: white;">NEGATIVOS</b>, por lo cual no se recomienda leer a la persona.</p>`

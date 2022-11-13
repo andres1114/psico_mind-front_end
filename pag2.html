@@ -5,44 +5,109 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Psicomind/Twitter</title>
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/styles.css" rel="stylesheet">
+        <link href="css/bootstrap.min.css" rel="stylesheet"/>
+        <link href="css/styles.css" rel="stylesheet"/>
+        <link href="css/fontawesome.min.css" rel="stylesheet"/>
     </head>
     <body>
-        <div style="display: none;" id="hidden-elements">
-            <input type="text" id="run-id-holder"/>
-        </div>
-        <h1 class="titulo">Psicomind</h1>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light barra">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="pag2.html">Twitter</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="page3.html">Facebook</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="page4.html">Instagram</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Psicomind</a>
-                        </li>
-                    </ul>
-                    <form class="d-flex" id="form-1">
-                        <img src="img/twitter.png" height="50px">
-                        <input class="form-control me-2" type="search" aria-label="Search" id="search-input">
-                        <button class="btn btn-outline-success" type="submit" id="button-1">Buscar</button>
-                    </form>
+        <div class="container container-fluid">
+            <div style="display: none;" id="hidden-elements">
+                <input type="text" id="run-id-holder"/>
+                <input type="text" id="user-name"/>
+            </div>
+            <h1 class="titulo"><a href="index.html">Psicomind</a></h1>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light barra">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="pag2.html">Twitter</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="page3.html">Facebook</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="page4.html">Instagram</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.html">Psicomind</a>
+                            </li>
+                        </ul>
+                        <form class="d-flex" id="form-1">
+                            <img src="img/twitter.png" height="50px">
+                            <input class="form-control me-2" type="search" aria-label="Search" id="search-input">
+                            <button class="btn btn-outline-success" type="submit" id="button-1">Buscar</button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+            <div class="row" id="twitter-matching-users-list">
+                <div class="col-12">
+                    <table class="table table-hover" id="table-1">
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
-        </nav>
-        <table class="table" id="table-1">
-            <tbody></tbody>
-        </table>
+            <div class="row" id="twitter-user-posts-list" style="display: none;">
+                <div class="col-8">
+                    <table class="table" id="table-2">
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-body" id="overall-sentiment-analysis">
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h5 class="modal-title">Estadisticas&nbsp;<span id="processed-items"></span>&nbsp;</h5>
+                                </div>
+                                <div class="col-6 text-right" id="processed-items-loader" style="display: none;">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Promedio de tweets positivos<span class="badge bg-success rounded-pill" id="average-positive"></span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Promedio de tweets neutros<span class="badge bg-primary rounded-pill" id="average-neutral"></span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Promedio de tweets negativos<span class="badge bg-danger rounded-pill" id="average-negative"></span></li>
+                            </ul>
+                            <hr/>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Cantidad de tweets positivos<span class="badge bg-success rounded-pill" id="total-positive"></span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Cantidad de tweets neutrales<span class="badge bg-primary rounded-pill" id="total-neutral"></span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Cantidad de tweets negativos<span class="badge bg-danger rounded-pill" id="total-negative"></span></li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">Cantidad de tweets<span class="badge bg-info rounded-pill" id="total-tweets"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="loader-overlay" id="loading-overlay" style="display:none;">
+            <div class="popup-spinner">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h4>Cargando...</h4>
+                            <br>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script src="js/jquery-3.6.1.min.js" type="text/javascript"></script>
         <script src="js/bootstrap.bundle.min.js" type="text/javascript"></script>
         <script src="js/main.js" type="text/javascript"></script>

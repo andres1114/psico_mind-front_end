@@ -20,6 +20,7 @@ function buscar(texto,red){
     objetoDeBusqueda.rrssList.push(red);
 
     var objetoDeBusquedaJSON = JSON.stringify(objetoDeBusqueda);
+    switchLoader();
 
     $.ajax({
         contentType: "application/x-www-form-urlencoded",
@@ -33,7 +34,9 @@ function buscar(texto,red){
             });
         },
         complete: function(){
-            //
+            showUserMatchSection();
+            hideUserPostListSection();
+            switchLoader();
         }
 
     });
@@ -62,6 +65,7 @@ function showMatchingUsers(args) {
         trNode.bind("click touchstart", function() {
             performSentimentAnalisys({
                 userId: $(this).attr("data-user-id"),
+                userName: $(this).find("td").html(),
                 rrss: 'twitter',
                 postLimitNumber: 10
             });
@@ -77,7 +81,10 @@ function performSentimentAnalisys(args) {
     let runId = uniqId({
         prefix: "_run_"
     });
+
     $("#run-id-holder").val(runId);
+    $("#user-name").val(args.userName);
+
     var Busquedausuario = new Object();
 
     Busquedausuario.checksumId = "";
@@ -88,6 +95,7 @@ function performSentimentAnalisys(args) {
     Busquedausuario.runId = $("#run-id-holder").val();
 
     var objetoDeBusquedaJSON = JSON.stringify(Busquedausuario);
+    switchLoader();
 
     $.ajax({
         contentType: "application/x-www-form-urlencoded",
@@ -99,9 +107,120 @@ function performSentimentAnalisys(args) {
             //
         },
         complete: function(){
+            hideUserMatchSection();
+            showUserPostListSection();
+            switchLoader();
+            requestSentimentAnalysisResult();
+        }
+    });
+}
+
+function requestSentimentAnalysisResult() {
+    let runId = $("#run-id-holder").val();
+
+    let jsonRequestObject = {};
+    jsonRequestObject.action = "showPerformedTweetSentimentAnalysis";
+    jsonRequestObject.runid = runId;
+
+    let jsonRequest = JSON.stringify(jsonRequestObject);
+    $.ajax({
+        contentType: "application/x-www-form-urlencoded",
+        url: "php/main.php",
+        type: "POST",
+        data: jsonRequest,
+        dataType: "json",
+        success: function(jsonResponsetObject){
+            showSentimentAnalysisResult({
+                responseObject: jsonResponsetObject
+            });
+        },
+        complete: function(){
             //
         }
     });
+}
+
+function showSentimentAnalysisResult(args) {
+    let responseObject = args.responseObject.response;
+    let tableNode = $("#table-2");
+    let tbodyNode = tableNode.find("tbody");
+
+    tbodyNode.empty();
+
+    let trNodeArray = [];
+    for (let x = 0; x < responseObject.posts.length; x++) {
+        let sentimentColorClass;
+        let sentimentIcon;
+        let trNode = $("<tr>");
+        let tdNode = $("<td>");
+        switch (responseObject.posts[x].postData.postSentimentEvaluation) {
+            case 'positive':
+                sentimentColorClass = 'positive-sentiment-color';
+                sentimentIcon = 'fa fa-thumbs-up';
+                break;
+            case 'neutral':
+                sentimentColorClass = 'neutral-sentiment-color';
+                sentimentIcon = 'fa fa-hand-point-up';
+                break;
+            case 'negative':
+                sentimentColorClass = 'negative-sentiment-color';
+                sentimentIcon = 'fa fa-thumbs-down';
+                break;
+        }
+        htmlContent = `<div class="card">
+                            <div class="row g-0">
+                                <div class="col-4 bg-light">
+                                    <h1 class="center-text margin-top-1">
+                                        <span class="${sentimentIcon} ${sentimentColorClass}"></span>
+                                    </h1>
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${$("#user-name").val()}</h5>
+                                        <hr/>
+                                        <span class="card-text">${responseObject.posts[x].postData.content}</span>
+                                    </div>
+                                 </div>
+                            </div>
+                        </div>`;
+        tdNode.html(htmlContent);
+        trNode.append(tdNode);
+        trNodeArray.push(trNode);
+    }
+
+    tbodyNode.append(trNodeArray);
+
+    $("#average-positive").html(((responseObject.sentimentData.averagePositivePosts) * 100).toFixed(1) + "%");
+    $("#average-neutral").html(((responseObject.sentimentData.averageNeutralPosts) * 100).toFixed(1) + "%");
+    $("#average-negative").html(((responseObject.sentimentData.averageNegativePosts) * 100).toFixed(1) + "%");
+    $("#total-positive").html(responseObject.sentimentData.numberOfPostivePosts);
+    $("#total-neutral").html(responseObject.sentimentData.numberOfNeutralPosts);
+    $("#total-negative").html(responseObject.sentimentData.numberOfNegativePosts);
+    $("#total-tweets").html(responseObject.sentimentData.totalPosts);
+
+    let overallSentimentText;
+    switch (responseObject.sentimentData.evaluation) {
+        case 'positive':
+            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-success" style="color: white;">POSITIVOS</b>, por lo cual se es indiferente si se lee o no a la persona.</p>`
+            break;
+        case 'neutral':
+            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-primary" style="color: white;">NEUTRALES</b>, por lo cual se recomienda leer a la persona.</p>`
+            break;
+        case 'negative':
+            overallSentimentText = `<p>Los tweets del usuario son en su mayoria <b class="bg-danger" style="color: white;">NEGATIVOS</b>, por lo cual no se recomienda leer a la persona.</p>`
+            break;
+    }
+
+    $("#overall-sentiment-analysis").html(overallSentimentText);
+
+    if (responseObject.runData.completedPosts != responseObject.sentimentData.totalPosts) {
+        $("#processed-items").html("("+responseObject.runData.completedPosts+"/"+responseObject.sentimentData.totalPosts+")");
+        showProcessedItemsLoader();
+        requestSentimentAnalysisResult();
+    } else {
+        $("#processed-items").html("");
+        hideProcessedItemsLoader();
+    }
 }
 
 function uniqId(args) {
@@ -157,4 +276,26 @@ function uniqId(args) {
     }
 
     return retId;
+}
+
+function switchLoader() {
+    $("#loading-overlay").toggle();
+}
+function showUserMatchSection() {
+    $("#twitter-matching-users-list").show();
+}
+function hideUserMatchSection() {
+    $("#twitter-matching-users-list").hide();
+}
+function showUserPostListSection() {
+    $("#twitter-user-posts-list").show();
+}
+function hideUserPostListSection() {
+    $("#twitter-user-posts-list").hide();
+}
+function showProcessedItemsLoader() {
+    $("#processed-items-loader").show();
+}
+function hideProcessedItemsLoader() {
+    $("#processed-items-loader").hide();
 }
